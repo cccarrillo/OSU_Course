@@ -36,6 +36,7 @@ to go
   if ticks >= 1000 [stop]
 end
 
+
 to move ;this is the butterfly procedure. decides whether to move to the highest surrounding patch
   ifelse random-float 1.0 < q
   [uphill elevation]
@@ -46,24 +47,24 @@ end
 GRAPHICS-WINDOW
 210
 10
-770
-571
+668
+469
 -1
 -1
-16.73
+3.0
 1
 10
 1
 1
 1
 0
+0
+0
 1
-1
-1
--16
-16
--16
-16
+0
+149
+0
+149
 0
 0
 1

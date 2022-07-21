@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>14th Exercise, Multiple Procedure Files</title>
+  <meta content="Dr. Charles Ehlschlaeger" name="author">
+  <meta content="Multiple Procedure Files" name="description">
+</head>
+<body>
+<h1>Lesson Fourteen:&nbsp;Multiple Procedure Files</h1>
+This lesson provides instructions on how to create an NLS file for
+procedures you wish to make assessable to other NetLogo applications.
+NLS files allow for more complicated models to be subdivided into
+discrete sections, improving the readability of models.<br>
+<br>
+In their enthusiasm to
+produce a working program,&nbsp;less experienced programmers or
+modelers often will string together commands until
+satisfied with the results.&nbsp;<a href="BigMassOfCode.html">Here is
+an example of such a
+program (BigMassOfCode.html)</a>. This model is from exercise six,
+Random Cycle, but purposely "uglified" to demonstrate poor coding
+practices. Conceptually, the model has three parts:<br>
+<ol>
+  <li>User interface containing scroll bars, a plot &amp; monitor, and
+the normal buttons and switches.</li>
+  <li>The Setup procedure containing:</li>
+  <ul>
+    <li>Code for random seed declaration</li>
+    <li>Initializing global values and&nbsp;</li>
+    <li>Printing the output header</li>
+  </ul>
+  <li>The Go procedure containing:</li>
+  <ul>
+    <li>Update the day stepping variable</li>
+    <li>Getting the day's random variable</li>
+    <li>Printing &amp; displaying the output</li>
+  </ul>
+</ol>
+However, you probably couldn't easily figure that out if you were
+looking at <a href="BigMassOfCode.html">BigMassOfCode.html</a>.
+However, if you were looking at a well defined Setup or Go procedure,
+you could more easily understand the code's goal with:<br>
+<br>
+<span style="font-family: monospace;">to Setup</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; show "Setup beginning"</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; clear-all</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; InitializeVariables</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; output-print
+"timeStep,dateString,randomValue,standardDeviationRandomValue,correlationRandomValue"</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; reset-ticks</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; show "Setup ending"</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">end</span><br
+ style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">to Go</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; set gVariableDayStep
+gVariableDayStep + 1</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; ;; RandomCycle, from
+nlsFiles/RandomCycle.nls, reports a</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;
+;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; temporally autocorrelated
+cyclic random value. </span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; let testList
+RandomCycle_Get </span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+gVariableDayStep </span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+dayMaximumValue </span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+365.25 </span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+lowMeanValue </span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+highMeanValue </span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+standardDeviationRandomValue </span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+correlationRandomValue</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+globalRandomValue</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; set todayValue first
+testList</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; set globalRandomValue last
+testList</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; PrintToOutput</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; UpdatePlots</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; tick</span><br
+ style="font-family: monospace;">
+<span style="font-family: monospace;">end</span><br>
+<br>
+You practically don't need comments to see the main logic of the
+program. In a perfect world, your main procedures will never have more
+than 7-9 commands so that it will be easy to figure out the code.
+Creating reusable code in .nls files requires the extensive use of the
+to-report command. to-report is necessary because the .nls files should
+not access global variables but have all variables local to the .nls
+file. To ensure there is no mixing of global variables, one convention
+is to have all .nls variables and procedure names begin with a unique
+string. For example, RandomCycle.nls has all procedures and variables
+begin with the string "RandomCycle_". <br>
+<h3>Files needed:&nbsp;<a href="14RandomCycle.nlogo">14RandomCycle.nlogo</a>,&nbsp;<a
+ href="nlsFiles/RandomCycle.nls">RandomCycle.nls</a>, and <a
+ href="nlsFiles/DateStampConvertor.nls">DateStampConvertor.nls</a>.</h3>
+<h3>New Concepts Demonstrated:</h3>
+<ul>
+  <li>Decoupling code to nls files.</li>
+  <li>Passing multiple variables from a procedure.</li>
+</ul>
+<span style="font-weight: bold;">Homework Assignment:</span> Add a
+trend parameter to RandomCycleCalculator.nls. Add a slider bar ABOVE
+the setup button to set the long term trend of the random variable.<br>
+</body>
+</html>

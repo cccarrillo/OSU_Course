@@ -1,0 +1,110 @@
+; ConvertSpace.nls
+;; POC: Charles Ehlschlaeger
+;;      Charles.R.Ehlschlaeger@usace.army.mil
+;; Date of Last Edit: 2012 August 24
+;; Version: 2.0
+;;    change by +1.0 if procedure names or variables modified
+;;    change by +0.1 if new procedures are added to NLS file
+;;        or if results are different due to code change
+;;    change by +0.01 if bug fixes or internal logic faster/accurate
+;;    change by +0.001 if change in comments or cosmetic changes to code
+
+;; ConvertSpace Library contains a set of routines that allow a user to convert between 
+;;   real world planar coordinates, such as eastings and northings, into model units.
+;;   One model unit is the distance it takes to travel one patch horizontally or 
+;;   vertically. Various NetLogo's gis extension commands create a world-envelope array
+;;   containing the extents of GIS data layers. The envelope is the only input
+;;   necessary for the library to work properly.
+
+;; These global variables must exist for the library to work properly. This NLS file,
+;;   and others used in this tutorial, use the following convention:
+;;        NLSname_variableName for global variables (first letter of variable lower case)
+;;        NLSname_ProcedureName for procedures (first letter of procedure upper case)
+globals [
+  ConvertSpace_model2worldEastingMultiplier
+  ConvertSpace_model2worldNorthingMultiplier
+  ConvertSpace_model2worldAverageMultiplier
+  ConvertSpace_modelCenterEasting
+  ConvertSpace_modelCenterNorthing
+]
+
+;; This setup function needs the gis extension's world-envelope, which can be reported with:
+;;   let ConvertSpace_worldEnvelope gis:world-envelope
+;;     The gis:world-envelope procedure should be called after the gis:set-world-envelope-ds
+;;     procedure is called.
+to ConvertSpace_Setup [ ConvertSpace_worldEnvelope ]
+    let minEasting item 0 ConvertSpace_worldEnvelope
+    let maxEasting item 1 ConvertSpace_worldEnvelope
+    let minNorthing item 2 ConvertSpace_worldEnvelope
+    let maxNorthing item 3 ConvertSpace_worldEnvelope
+    show ConvertSpace_worldEnvelope
+    type "min-pxcor: "
+    type min-pxcor
+    type ", max-pxcor: "
+    type max-pxcor
+    type ", min-pycor: "
+    type min-pycor
+    type ", max-pycor: "
+    print max-pycor
+    set ConvertSpace_modelCenterEasting (maxEasting + minEasting) / 2.0
+    set ConvertSpace_modelCenterNorthing (maxNorthing + minNorthing) / 2.0
+    set ConvertSpace_model2worldEastingMultiplier
+      (maxEasting - minEasting) / (max-pxcor - min-pxcor)
+    set ConvertSpace_model2worldNorthingMultiplier 
+      (maxNorthing - minNorthing) / (max-pycor - min-pycor)
+    set ConvertSpace_model2worldAverageMultiplier 
+     (ConvertSpace_model2worldNorthingMultiplier + ConvertSpace_model2worldEastingMultiplier) / 2.0
+    type "ConvertSpace_model2worldEastingMultiplier: "
+    print ConvertSpace_model2worldEastingMultiplier
+    type "ConvertSpace_model2worldNorthingMultiplier: "
+    print ConvertSpace_model2worldNorthingMultiplier
+    type "ConvertSpace_model2worldAverageMultiplier: "
+    print ConvertSpace_model2worldAverageMultiplier
+    type "Easting Multiplier / Northing Multiplier: "
+    print (ConvertSpace_model2worldEastingMultiplier / ConvertSpace_model2worldNorthingMultiplier)
+    ifelse ConvertSpace_model2worldEastingMultiplier > ConvertSpace_model2worldNorthingMultiplier
+    [
+      print "ConvertSpace_Setup: Easting Multiplier greater than than Northing Multiplier"
+      print "You may have squarer patches by increasing max-pxcor in Model Settings"
+      print "       or by decreasing max-pycor in Model Settings"
+    ][
+      if ConvertSpace_model2worldEastingMultiplier < ConvertSpace_model2worldNorthingMultiplier 
+      [
+        print "ConvertSpace_Setup: Easting Multiplier less than than Northing Multiplier"
+        print "You may have squarer patches by decreasing max-pxcor in Model Settings"
+        print "       or by increasing max-pycor in Model Settings"
+      ]
+    ]
+      
+    
+end
+
+;; Reports (returns) the East/West real world coordinate for the model x coordinate
+to-report ConvertSpace_Px2WorldEasting [ px ]
+  report px * ConvertSpace_model2worldEastingMultiplier + ConvertSpace_modelCenterEasting
+end
+
+;; Reports (returns) the North/South real world coordinate for the model y coordinate
+to-report ConvertSpace_Py2WorldNorthing [ py ]
+  report py * ConvertSpace_model2worldNorthingMultiplier + ConvertSpace_modelCenterNorthing
+end
+
+;; Reports (returns) the model x coordinate for the East/West real world coordinate
+to-report ConvertSpace_WorldEasting2Px [ worldEasting ]
+  report (worldEasting - ConvertSpace_modelCenterEasting) /  ConvertSpace_model2worldEastingMultiplier
+end
+
+;; Reports (returns) the model y coordinate for the North/South real world coordinate
+to-report ConvertSpace_WorldNorthing2Py [ worldNorthing ]
+  report (worldNorthing - ConvertSpace_modelCenterNorthing) /  ConvertSpace_model2worldNorthingMultiplier 
+end
+
+;; Reports (returns) the real world distance for a model distance
+to-report ConvertSpace_ModelDistance2WorldDistance [ modelDistance ]
+  report modelDistance * ConvertSpace_model2worldAverageMultiplier
+end
+
+;; Reports (returns) the model distance for a real world distance
+to-report ConvertSpace_WorldDistance2ModelDistance [ worldDistance ]
+  report worldDistance / ConvertSpace_model2worldAverageMultiplier
+end

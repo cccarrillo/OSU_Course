@@ -1,0 +1,72 @@
+;; RandomCycle.nls
+;; POC: Charles Ehlschlaeger
+;;      Charles.R.Ehlschlaeger@usace.army.mil
+;; Date of Last Edit: 2012 September 25
+;; Version: 2.0
+;;    change by +1.0 if procedure names or variables modified
+;;    change by +0.1 if new procedures are added to NLS file
+;;        or if results are different due to code change
+;;    change by +0.01 if bug fixes or internal logic faster/accurate
+;;    change by +0.001 if change in comments or cosmetic changes to code
+
+;; RandomCycle allows a variable in a model to be:
+;    * Stochastic with a Gaussian distribution.
+;    * Demonstrate cyclic behavior where the mean value of the distribution
+;        has a low point at one part of the cycle and a high point at another
+;        part of the cycle. The cycle is in the form of a sin function.
+;    * Have the variable demonstrate temporal autocorrelative behavior if desired.
+
+; written by Charles Ehlschlaeger
+
+; RandomCycle returns a list of two elements
+;    the first element contains the autocorrelated random value
+;    the second element is the randomized Gaussian value necessary to correlate
+;         the next time step's random value
+to-report RandomCycle_Get [ 
+        RandomCycle_globalVariableTimeStep   ; time step
+        RandomCycle_maximumCycleTime         ; time into cycle at high part of cycle
+        RandomCycle_cycleLength              ; time steps before cycle repeats
+        RandomCycle_minMeanValue             ; average value at the low part of cycle
+        RandomCycle_maxMeanValue             ; average value at the high part of cycle
+        RandomCycle_standardDevRandomValue   ; standard deviation of random value variation around the current mean
+                                             ;       NOT the standard deviation across the entire cycle
+        RandomCycle_correlationOfRandomValue ; value 0-1 indicating what proportion of previous deviation from mean to be
+                                             ;       used in this calculation
+        RandomCycle_globalRandomValue        ; Randomized Gaussian value from previous time step
+  ]
+  let RandomCycle_todaysMeanValue 
+    (RandomCycle_globalVariableTimeStep - RandomCycle_maximumCycleTime) mod RandomCycle_cycleLength
+  set RandomCycle_todaysMeanValue 1.0 + 
+    cos (360.0 * (RandomCycle_todaysMeanValue / RandomCycle_cycleLength))
+  set RandomCycle_todaysMeanValue 
+    (RandomCycle_todaysMeanValue * .5 * 
+      (RandomCycle_maxMeanValue - RandomCycle_minMeanValue)) + RandomCycle_minMeanValue
+  
+  ; the following line is a property of Gaussian random values and how much they are 
+  ;    correlated (0 is no correlation, 1.0 is 100%
+  let RandomCycle_currentRandom random-normal 0.0 RandomCycle_standardDevRandomValue
+  ifelse RandomCycle_currentRandom >= 0
+  [
+    set RandomCycle_currentRandom RandomCycle_currentRandom * RandomCycle_currentRandom
+  ][
+    set RandomCycle_currentRandom RandomCycle_currentRandom * RandomCycle_currentRandom * -1.0
+  ]
+  ifelse RandomCycle_globalRandomValue >= 0
+  [
+    set RandomCycle_globalRandomValue RandomCycle_globalRandomValue * RandomCycle_globalRandomValue
+  ][
+    set RandomCycle_globalRandomValue RandomCycle_globalRandomValue * RandomCycle_globalRandomValue * -1.0
+  ]
+  set RandomCycle_globalRandomValue 
+    RandomCycle_correlationOfRandomValue * RandomCycle_globalRandomValue + 
+    (1 - RandomCycle_correlationOfRandomValue) * RandomCycle_currentRandom
+  ifelse RandomCycle_globalRandomValue >= 0
+  [
+    set RandomCycle_globalRandomValue RandomCycle_globalRandomValue ^ 0.5
+  ][
+    set RandomCycle_globalRandomValue -1.0 * ((-1.0 * RandomCycle_globalRandomValue) ^ 0.5)
+  ]
+  
+  set todayValue RandomCycle_todaysMeanValue + RandomCycle_globalRandomValue
+  report list todayValue RandomCycle_globalRandomValue
+end

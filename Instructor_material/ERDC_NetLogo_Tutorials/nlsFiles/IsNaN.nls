@@ -1,0 +1,3 @@
+to-report IsNaN [ isNaNValueToCheck]
+  report not ( isNaNValueToCheck > 0 or isNaNValueToCheck < 0 or isNaNValueToCheck = 0)
+end

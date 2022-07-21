@@ -1,0 +1,68 @@
+; ConvertPxPyToWorldCoordinates.nls
+;; POC: Charles Ehlschlaeger
+;;      Charles.R.Ehlschlaeger@usace.army.mil
+;; Date of Last Edit: 2012 August 24
+;; Version: 1.001
+;;    change by +1.0 if procedure names or variables modified
+;;    change by +0.1 if new procedures are added to NLS file
+;;        or if results are different due to code change
+;;    change by +0.01 if bug fixes or internal logic faster/accurate
+;;    change by +0.001 if change in comments or cosmetic changes to code
+
+;; CalculateAXplusConstant
+
+globals [
+  model2worldEastingMultiplier
+  model2worldNorthingMultiplier
+  model2worldAverageMultiplier
+  modelCenterEasting
+  modelCenterNorthing
+]
+
+to CalculateCoordinateConversionVariables [ worldList ]
+    let minEasting item 0 worldList
+    let maxEasting item 1 worldList
+    let minNorthing item 2 worldList
+    let maxNorthing item 3 worldList
+    show worldList
+    show min-pxcor
+    show max-pxcor
+    show min-pycor
+    show max-pycor
+    set modelCenterEasting (maxEasting + minEasting) / 2.0
+    set modelCenterNorthing (maxNorthing + minNorthing) / 2.0
+    set model2worldEastingMultiplier (maxEasting - minEasting) / (max-pxcor - min-pxcor)
+    set model2worldNorthingMultiplier (maxNorthing - minNorthing) / (max-pycor - min-pycor)
+    set model2worldAverageMultiplier (model2worldNorthingMultiplier + model2worldEastingMultiplier) / 2.0
+    show "model2worldEastingMultiplier:"
+    show model2worldEastingMultiplier
+    show "model2worldNorthingMultiplier:"
+    show model2worldNorthingMultiplier
+    show "model2worldAverageMultiplier:"
+    show model2worldAverageMultiplier
+    
+end
+
+to-report ConvertPx2WorldEasting [ px ]
+  report px * model2worldEastingMultiplier + modelCenterEasting
+end
+
+to-report ConvertPy2WorldNorthing [ py ]
+  report py * model2worldNorthingMultiplier + modelCenterNorthing
+end
+
+to-report ConvertWorldEasting2Px [ worldEasting ]
+  report (worldEasting - modelCenterEasting) /  model2worldEastingMultiplier
+end
+
+to-report ConvertWorldNorthing2Py [ worldNorthing ]
+  report (worldNorthing - modelCenterNorthing) /  model2worldNorthingMultiplier 
+end
+
+to-report ConvertModelDistance2WorldDistance [ modelDistance ]
+  report modelDistance * model2worldAverageMultiplier
+end
+
+to-report ConvertWorldDistance2ModelDistance [ worldDistance ]
+  report worldDistance / model2worldAverageMultiplier
+end

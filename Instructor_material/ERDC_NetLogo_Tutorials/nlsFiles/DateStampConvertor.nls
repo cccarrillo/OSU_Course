@@ -1,0 +1,89 @@
+;; DateStampConvertor.nls
+;; POC: Charles Ehlschlaeger
+;;      Charles.R.Ehlschlaeger@usace.army.mil
+;; Date of Last Edit: 2012 August 24
+;; Version: 1.001
+;;    change by +1.0 if procedure names or variables modified
+;;    change by +0.1 if new procedures are added to NLS file
+;;        or if results are different due to code change
+;;    change by +0.01 if bug fixes or internal logic faster/accurate
+;;    change by +0.001 if change in comments or cosmetic changes to code
+
+;; DateStampConvertor returns a text string indicating the day of the year by Month and day number.
+;;    The input, dayNumber, can be positive or negative
+to-report DateStampConvertor [ dayNumber ]
+  ;
+  let day int ( dayNumber mod 365.25)
+  while [ day < 1]
+  [
+    set day day + 365
+  ]
+  if day <= 31
+  [
+    let date word "January " day
+    report date 
+  ]
+  set day day - 31
+  if day <= 28
+  [
+    let date word "Feburary " day
+    report date 
+  ]
+  set day day - 28
+  if day <= 31
+  [
+    let date word "March " day
+    report date 
+  ]
+  set day day - 31
+  if day <= 30
+  [
+    let date word "April " day
+    report date 
+  ]
+  set day day - 30
+  if day <= 31
+  [
+    let date word "May " day
+    report date 
+  ]
+  set day day - 31
+  if day <= 30
+  [
+    let date word "June " day
+    report date 
+  ]
+  set day day - 30
+  if day <= 31
+  [
+    let date word "July " day
+    report date 
+  ]
+  set day day - 31
+  if day <= 31
+  [
+    let date word "August " day
+    report date 
+  ]
+  set day day - 31
+  if day <= 30
+  [
+    let date word "September " day
+    report date 
+  ]
+  set day day - 30
+  if day <= 31
+  [
+    let date word "October " day
+    report date 
+  ]
+  set day day - 31
+  if day <= 30
+  [
+    let date word "November " day
+    report date 
+  ]
+  set day day - 30
+  let date word "December " day
+  report date 
+end

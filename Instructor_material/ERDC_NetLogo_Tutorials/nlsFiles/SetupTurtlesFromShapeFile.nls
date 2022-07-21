@@ -1,0 +1,41 @@
+;; SetupTurtlesFromShapeFile.nls
+to SetupTurtlesFromShapeFile [
+        shapefile
+  ]
+  ;; shapefile should have the following columns:
+  ;;  easting,northing,age,male,income,shape
+  
+  ;; easting and northing not necessary 'cause data is in shape
+  
+  ;; while more rows in file
+  foreach gis:feature-list-of shapefile [    
+    ;; create new turtle
+    crt 1 [
+      ;; read easting & northing
+      let pointLocation gis:location-of (first (first (gis:vertex-lists-of ?)))
+      if not empty? pointLocation [
+        set xcor item 0 pointLocation
+        set ycor item 1 pointLocation
+        set size 1
+        ;output-type "xcor: "
+        ;output-type xcor
+        ;output-type ", ycor: "
+        ;output-print ycor
+      ]
+      ;; read age
+      set age gis:property-value ? "age"
+      ;; read male
+      set male gis:property-value ? "male"
+      ifelse male = 1 [
+        set shape "arrow"
+        set color blue
+      ] 
+      [
+        set shape "circle"
+        set color pink
+      ]
+      ;; read income
+      set income gis:property-value ? "income"
+    ]
+  ]
+end

@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Big Mass of Code</title>
+</head>
+<body>
+globals [<br>
+&nbsp; globalRandomValue<br>
+&nbsp; todayValue<br>
+&nbsp; globalVariableDayStep<br>
+]<br>
+<br>
+to Setup<br>
+&nbsp; show "Setup beginning"<br>
+&nbsp; clear-all<br>
+&nbsp; if UseRandomSeed<br>
+&nbsp; [<br>
+&nbsp;&nbsp;&nbsp; random-seed 17<br>
+&nbsp; ]<br>
+&nbsp; set globalRandomValue random-normal 0.0
+standardDeviationRandomValue<br>
+&nbsp; <br>
+&nbsp; ; The following statements are from 02HelloWorld<br>
+&nbsp; set globalVariableDayStep 0<br>
+&nbsp; ; End of statements are from 02HelloWorld<br>
+&nbsp; <br>
+&nbsp; output-print
+"timeStep,dateString,randomValue,standardDeviationRandomValue,correlationRandomValue"<br>
+&nbsp; reset-ticks<br>
+&nbsp; show "Setup ending"<br>
+end<br>
+<br>
+to Go<br>
+&nbsp; set globalVariableDayStep globalVariableDayStep + 1<br>
+&nbsp; <br>
+&nbsp; let value (globalVariableDayStep - dayMaximumValue) mod 365.25<br>
+&nbsp; set value 1.0 + cos (360.0 * (value / 365.0))<br>
+&nbsp; set value (value * .5 * (maximumMeanValue - minimumMeanValue)) +
+minimumMeanValue<br>
+&nbsp; <br>
+&nbsp; let currentRandom random-normal 0.0 standardDeviationRandomValue<br>
+&nbsp;<br>
+&nbsp; ifelse currentRandom &gt;= 0<br>
+&nbsp; [<br>
+&nbsp;&nbsp;&nbsp; set currentRandom currentRandom * currentRandom<br>
+&nbsp; ][<br>
+&nbsp;&nbsp;&nbsp; set currentRandom currentRandom * currentRandom *
+-1.0<br>
+&nbsp; ]<br>
+&nbsp; ifelse globalRandomValue &gt;= 0<br>
+&nbsp; [<br>
+&nbsp;&nbsp;&nbsp; set globalRandomValue globalRandomValue *
+globalRandomValue<br>
+&nbsp; ][<br>
+&nbsp;&nbsp;&nbsp; set globalRandomValue globalRandomValue *
+globalRandomValue * -1.0<br>
+&nbsp; ]<br>
+&nbsp; set globalRandomValue correlationRandomValue * globalRandomValue
++ (1 - correlationRandomValue) * currentRandom<br>
+&nbsp; ifelse globalRandomValue &gt;= 0<br>
+&nbsp; [<br>
+&nbsp;&nbsp;&nbsp; set globalRandomValue globalRandomValue ^ 0.5<br>
+&nbsp; ][<br>
+&nbsp;&nbsp;&nbsp; set globalRandomValue -1.0 * ((-1.0 *
+globalRandomValue) ^ 0.5)<br>
+&nbsp; ]<br>
+&nbsp; set todayValue value + globalRandomValue<br>
+<br>
+&nbsp; let day int (&nbsp;globalVariableDayStep mod 365.25)<br>
+&nbsp; let date "non yet"<br>
+&nbsp; while [ day &lt; 1]<br>
+&nbsp; [<br>
+&nbsp;&nbsp;&nbsp; set day day + 365<br>
+&nbsp; ]<br>
+&nbsp; if day &lt;= 31<br>
+&nbsp; [<br>
+&nbsp;&nbsp;&nbsp; set date word "January " day<br>
+&nbsp;&nbsp;&nbsp; set day 99999999<br>
+&nbsp; ]<br>
+&nbsp; set day day - 31<br>
+&nbsp; if day &lt;= 28<br>
+&nbsp; [<br>
+&nbsp;&nbsp;&nbsp; set date word "February " day<br>
+&nbsp;&nbsp;&nbsp; set day 99999999<br>
+&nbsp; ]<br>
+&nbsp; set day day - 28<br>
+&nbsp; if day &lt;= 31<br>
+&nbsp; [<br>
+&nbsp;&nbsp;&nbsp; set date word "March " day<br>
+&nbsp;&nbsp;&nbsp; set day 99999999<br>
+&nbsp; ]<br>
+&nbsp; set day day - 31<br>
+&nbsp; if day &lt;= 30<br>
+&nbsp; [<br>
+&nbsp;&nbsp;&nbsp; set date word "April " day<br>
+&nbsp;&nbsp;&nbsp; set day 99999999<br>
+&nbsp; ]<br>
+&nbsp; set day day - 30<br>
+&nbsp; if day &lt;= 31<br>
+&nbsp; [<br>
+&nbsp;&nbsp;&nbsp; set date word "May " day<br>
+&nbsp;&nbsp;&nbsp; set day 99999999<br>
+&nbsp; ]<br>
+&nbsp; set day day - 31<br>
+&nbsp; if day &lt;= 30<br>
+&nbsp; [<br>
+&nbsp;&nbsp;&nbsp; set date word "June " day<br>
+&nbsp;&nbsp;&nbsp; set day 99999999<br>
+&nbsp; ]<br>
+&nbsp; set day day - 30<br>
+&nbsp; if day &lt;= 31<br>
+&nbsp; [<br>
+&nbsp;&nbsp; &nbsp;set date word "July " day<br>
+&nbsp;&nbsp;&nbsp; set day 99999999<br>
+&nbsp; ]<br>
+&nbsp; set day day - 31<br>
+&nbsp; if day &lt;= 31<br>
+&nbsp; [<br>
+&nbsp;&nbsp;&nbsp; set date word "August " day<br>
+&nbsp;&nbsp;&nbsp; set day 99999999<br>
+&nbsp; ]<br>
+&nbsp; set day day - 31<br>
+&nbsp; if day &lt;= 30<br>
+&nbsp; [<br>
+&nbsp;&nbsp;&nbsp; set date word "September " day<br>
+&nbsp;&nbsp;&nbsp; set day 99999999<br>
+&nbsp; ]<br>
+&nbsp; set day day - 30<br>
+&nbsp; if day &lt;= 31<br>
+&nbsp; [<br>
+&nbsp;&nbsp;&nbsp; set date word "October " day<br>
+&nbsp;&nbsp;&nbsp; set day 99999999<br>
+&nbsp; ]<br>
+&nbsp; set day day - 31<br>
+&nbsp; if day &lt;= 30<br>
+&nbsp; [<br>
+&nbsp;&nbsp;&nbsp; set date word "November " day<br>
+&nbsp;&nbsp;&nbsp; set day 99999999<br>
+&nbsp; ]<br>
+&nbsp; set day day - 30<br>
+&nbsp; if day &lt;= 31<br>
+&nbsp; [<br>
+&nbsp; &nbsp; set date word "December " day<br>
+&nbsp; ]<br>
+&nbsp; output-type globalVariableDayStep output-type "," <br>
+&nbsp; output-type date output-type
+","<br>
+&nbsp; output-type todayValue output-type ","<br>
+&nbsp; output-type standardDeviationRandomValue output-type "," <br>
+&nbsp; output-print correlationRandomValue<br>
+&nbsp; tick<br>
+&nbsp; set-current-plot "Silly Random Plot"<br>
+&nbsp; set-current-plot-pen "Random Value"<br>
+&nbsp; plot todayValue<br>
+end<br>
+</body>
+</html>

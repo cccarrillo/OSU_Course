@@ -1,6 +1,6 @@
 turtles-own[sex adult?]
-patches-own[water?]
-globals [foo]
+patches-own[water? tmp]
+globals [foo new-patchset]
 
 to setup
   ca
@@ -46,15 +46,36 @@ to go
 
 
 end
+
+to new-map
+ask patches [set pcolor blue]
+ask n-of 22 patches [set pcolor orange]
+ask patch 10 10 [set pcolor yellow]
+end
+
+to filter-agentset
+
+  set new-patchset patches with [(pcolor = blue) and (any? (neighbors with [pcolor = orange]))]
+
+;  let temp patches with [pcolor = blue]
+;  ask temp [if any? neighbors with [pcolor = orange] [set tmp 1]]
+;  let orange-neighbors patches with [tmp = 1]
+;  ask orange-neighbors [set pcolor green]
+
+
+
+  print new-patchset
+
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 220
-42
-547
-370
+41
+448
+270
 -1
 -1
-45.6
+20.0
 1
 10
 1
@@ -65,9 +86,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-6
+10
 0
-6
+10
 0
 0
 1
@@ -125,7 +146,7 @@ SWITCH
 190
 breeding-season?
 breeding-season?
-0
+1
 1
 -1000
 
